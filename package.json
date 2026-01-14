@@ -1,11 +1,11 @@
 {
   "name": "backend-coderhouse",
+  "type": "module",
   "version": "1.0.0",
   "description": "API para gestión de productos y carritos",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
   },
   "keywords": [
     "api",
@@ -15,6 +15,7 @@
   "author": "Nicolás Azcuy",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "uuid": "^13.0.0"
   }
 }
