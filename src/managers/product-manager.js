@@ -23,7 +23,7 @@ export default class ProductManager {
     try {
       const products = await this.getAll();
       const product = products.find((p) => p.id === id);
-      if (!product) return null; // Retornamos null si no existe para manejarlo en el router
+      if (!product) return null;
       return product;
     } catch (error) {
       throw new Error(`Error al obtener producto: ${error}`);
@@ -34,15 +34,14 @@ export default class ProductManager {
     try {
       const products = await this.getAll();
       
-      // Validamos que estén todos los campos obligatorios
       if (!obj.title || !obj.description || !obj.code || !obj.price || !obj.stock || !obj.category) {
-         throw new Error("Todos los campos son obligatorios (excepto thumbnails)");
+         throw new Error("Todos los campos son obligatorios");
       }
 
       const newProduct = {
         id: uuidv4(),
-        status: true, // Por defecto true según la consigna
-        thumbnails: obj.thumbnails || [], // Si no viene, array vacío
+        status: true,
+        thumbnails: obj.thumbnails || [],
         ...obj
       };
 
