@@ -6,7 +6,6 @@ export default class CartManager {
     this.path = path;
   }
 
-  // 1. Leer todos los carritos (auxiliar para uso interno)
   async getAll() {
     try {
       if (fs.existsSync(this.path)) {
@@ -20,13 +19,12 @@ export default class CartManager {
     }
   }
 
-  // 2. Crear un carrito nuevo (POST /)
   async create() {
     try {
       const carts = await this.getAll();
       const newCart = {
         id: uuidv4(),
-        products: [], // Empieza vacío
+        products: [],
       };
       carts.push(newCart);
       await fs.promises.writeFile(this.path, JSON.stringify(carts, null, 2));
@@ -36,7 +34,6 @@ export default class CartManager {
     }
   }
 
-  // 3. Obtener un carrito por ID (GET /:cid)
   async getById(id) {
     try {
       const carts = await this.getAll();
@@ -48,24 +45,19 @@ export default class CartManager {
     }
   }
 
-  // 4. Agregar producto al carrito (POST /:cid/product/:pid)
   async addProductToCart(cartId, productId) {
     try {
       const carts = await this.getAll();
       const cartIndex = carts.findIndex((c) => c.id === cartId);
 
       if (cartIndex === -1) throw new Error("Carrito no encontrado");
-
-      // Verificamos si el producto ya existe DENTRO del carrito
       const productIndex = carts[cartIndex].products.findIndex(
         (p) => p.product === productId
       );
 
       if (productIndex !== -1) {
-        // Si existe, sumamos la cantidad
         carts[cartIndex].products[productIndex].quantity++;
       } else {
-        // Si no existe, lo agregamos con quantity: 1
         carts[cartIndex].products.push({
           product: productId,
           quantity: 1,
