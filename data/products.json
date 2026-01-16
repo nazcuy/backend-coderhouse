@@ -1,0 +1,46 @@
+[
+  {
+    "id": "6db00b0f-4673-4d7e-9e28-eadd0f74d82b",
+    "status": true,
+    "thumbnails": [],
+    "title": "Monitor Gamer 144hz",
+    "description": "24 pulgadas Full HD",
+    "code": "MON-001",
+    "price": 250,
+    "stock": 15,
+    "category": "Monitores"
+  },
+  {
+    "id": "e9683b1a-4d93-4a67-bf8e-b3b4f9346a7f",
+    "status": true,
+    "thumbnails": [],
+    "title": "Samsung Galaxy S24",
+    "description": "256GB, Color Negro, Pantalla Dynamic AMOLED",
+    "code": "SAM-S24-001",
+    "price": 1200,
+    "stock": 10,
+    "category": "Celulares"
+  },
+  {
+    "id": "c6589185-4825-4a85-a214-d0be121f23a5",
+    "status": true,
+    "thumbnails": [],
+    "title": "iPhone 15",
+    "description": "128GB, Color Blue, Chip A16 Bionic",
+    "code": "APP-IP15-002",
+    "price": 1100,
+    "stock": 5,
+    "category": "Celulares"
+  },
+  {
+    "id": "993271f4-0b30-4b46-9ab9-fe2b7747deaf",
+    "status": true,
+    "thumbnails": [],
+    "title": "Motorola Edge 40",
+    "description": "256GB, Color Viva Magenta, Carga rápida",
+    "code": "MOT-E40-003",
+    "price": 800,
+    "stock": 15,
+    "category": "Celulares"
+  }
+]
