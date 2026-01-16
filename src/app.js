@@ -1,13 +1,14 @@
 import express from "express";
 import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
+import morgan from "morgan";
 
 const app = express();
 const PORT = 8080;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(morgan("dev"));
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 

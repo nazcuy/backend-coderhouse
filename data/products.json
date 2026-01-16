@@ -1,16 +1,5 @@
 [
   {
-    "id": "6db00b0f-4673-4d7e-9e28-eadd0f74d82b",
-    "status": true,
-    "thumbnails": [],
-    "title": "Monitor Gamer 144hz",
-    "description": "24 pulgadas Full HD",
-    "code": "MON-001",
-    "price": 250,
-    "stock": 15,
-    "category": "Monitores"
-  },
-  {
     "id": "e9683b1a-4d93-4a67-bf8e-b3b4f9346a7f",
     "status": true,
     "thumbnails": [],
@@ -41,6 +30,17 @@
     "code": "MOT-E40-003",
     "price": 800,
     "stock": 15,
+    "category": "Celulares"
+  },
+  {
+    "id": "ef0f284a-acc8-4d82-9ede-d55a3e1f1ab9",
+    "status": true,
+    "thumbnails": [],
+    "title": "Xiaomi Redmi Note 13 Pro",
+    "description": "256GB, Cámara de 200MP, Pantalla AMOLED 120Hz",
+    "code": "XIA-RN13-004",
+    "price": 450,
+    "stock": 20,
     "category": "Celulares"
   }
 ]
