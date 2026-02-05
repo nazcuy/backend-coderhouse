@@ -33,6 +33,7 @@ router.get("/:pid", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
         const newProduct = await manager.create(req.body);
+        req.io.emit("newProduct", newProduct);
         res.status(201).json(newProduct);
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -43,6 +44,7 @@ router.put("/:pid", async (req, res) => {
     try {
         const { pid } = req.params;
         const updatedProduct = await manager.update(pid, req.body);
+        req.io.emit("updateProduct", updatedProduct);
         res.json(updatedProduct);
     } catch (error) {
         res.status(404).json({ error: error.message });
@@ -53,6 +55,7 @@ router.delete("/:pid", async (req, res) => {
     try {
         const { pid } = req.params;
         await manager.delete(pid);
+        req.io.emit("deleteProduct", pid);
         res.json({ message: "Producto eliminado exitosamente" });
     } catch (error) {
         res.status(404).json({ error: error.message });
