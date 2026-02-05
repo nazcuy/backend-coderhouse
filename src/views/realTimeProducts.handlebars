@@ -1,0 +1,132 @@
+<h1>Productos en Tiempo Real</h1>
+<p>Esta vista se actualiza AUTOMÁTICAMENTE cuando otros usuarios crean/eliminan productos</p>
+
+<div id="products-container">
+    {{#if products}}
+        {{#each products}}
+            <div class="product" id="product-{{this.id}}">
+                <h3>{{this.title}}</h3>
+                <p><strong>Precio:</strong> ${{this.price}}</p>
+                <p><strong>Descripción:</strong> {{this.description}}</p>
+                <p><strong>Stock:</strong> {{this.stock}}</p>
+                <button onclick="deleteProduct('{{this.id}}')">Eliminar</button>
+            </div>
+        {{/each}}
+    {{else}}
+        <p id="no-products">No hay productos disponibles.</p>
+    {{/if}}
+</div>
+
+<hr>
+
+<h2>Agregar Nuevo Producto</h2>
+<form id="product-form">
+    <input type="text" id="title" placeholder="Título" required>
+    <input type="text" id="description" placeholder="Descripción" required>
+    <input type="number" id="price" placeholder="Precio" step="0.01" required>
+    <input type="text" id="code" placeholder="Código único" required>
+    <input type="number" id="stock" placeholder="Stock" required>
+    <input type="text" id="category" placeholder="Categoría" required>
+    <button type="submit">Agregar Producto</button>
+</form>
+
+<script>
+    const socket = io();
+    
+    console.log("WebSocket conectado, ID:", socket.id);
+
+    socket.on("newProduct", (product) => {
+        console.log("Nuevo producto recibido:", product);
+        
+        const container = document.getElementById("products-container");
+        const noProductosMsj = document.getElementById("no-products");
+        
+        if (noProductosMsj) {
+            noProductosMsj.remove();
+        }
+        
+        const productDiv = document.createElement("div");
+        productDiv.className = "product";
+        productDiv.id = `product-${product.id}`;
+        productDiv.innerHTML = `
+            <h3>${product.title}</h3>
+            <p><strong>Precio:</strong> $${product.price}</p>
+            <p><strong>Descripción:</strong> ${product.description}</p>
+            <p><strong>Stock:</strong> ${product.stock}</p>
+            <button onclick="deleteProduct('${product.id}')">Eliminar</button>
+        `;
+        
+        container.prepend(productDiv);
+    });
+    
+    socket.on("deleteProduct", (productId) => {
+        console.log("Producto eliminado:", productId);
+        
+        const productElement = document.getElementById(`product-${productId}`);
+        if (productElement) {
+            productElement.remove();
+        }
+        
+        const container = document.getElementById("products-container");
+        if (container.children.length === 0) {
+            const noProductosMsj = document.createElement("p");
+            noProductosMsj.id = "no-products";
+            noProductosMsj.textContent = "No hay productos disponibles.";
+            container.appendChild(noProductosMsj);
+        }
+    });
+    
+    document.getElementById("product-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const product = {
+            title: document.getElementById("title").value,
+            description: document.getElementById("description").value,
+            price: parseFloat(document.getElementById("price").value),
+            code: document.getElementById("code").value,
+            stock: parseInt(document.getElementById("stock").value),
+            category: document.getElementById("category").value,
+        };
+        
+        try {
+            const response = await fetch("/api/products", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(product)
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || "Error al crear producto");
+            }
+            
+            const result = await response.json();
+            console.log("Producto creado via HTTP:", result);
+            
+            document.getElementById("product-form").reset();
+                        
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    });
+        
+    window.deleteProduct = async (productId) => {
+        if (!confirm("¿Estás seguro de eliminar este producto?")) return;
+        
+        try {
+            const response = await fetch(`/api/products/${productId}`, {
+                method: "DELETE"
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || "Error al eliminar");
+            }
+            console.log("Producto eliminado via HTTP:", productId);
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    };
+</script>
