@@ -1,0 +1,17 @@
+<h1>Lista de Productos</h1>
+<p>Esta vista se actualiza solo al recargar la página</p>
+
+<div id="products-container">
+    {{#if products}}
+        {{#each products}}
+            <div class="product">
+                <h2>{{this.title}}</h2>
+                <p><strong>Precio:</strong> ${{this.price}}</p>
+                <p><strong>Descripción:</strong> {{this.description}}</p>
+                <p><strong>Stock:</strong> {{this.stock}}</p>
+            </div>
+        {{/each}}
+    {{else}}
+        <p>No hay productos disponibles.</p>
+    {{/if}}
+</div>

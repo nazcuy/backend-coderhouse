@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import handlebars from "express-handlebars";
 import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
+import viewsRouter from "./routes/views.router.js";
 import morgan from "morgan";
 
 const app = express();
@@ -29,6 +30,7 @@ app.use(express.static("public"));
 
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
+app.use("/", viewsRouter);
 
 app.get(/realTimeProducts/, (req, res) => {
   res.render("realTimeProducts", { 
