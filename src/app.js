@@ -32,18 +32,6 @@ app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
 
-app.get(/realTimeProducts/, (req, res) => {
-  res.render("realTimeProducts", { 
-    title: "Products en tiempo real"
-  });
-});
-
-app.get("/", async (req, res) => {
-  res.render("home", {
-    title: "Tienda de productos"
-  });
-});
-
 io.on("connection", (socket) => {
   console.log(`Nuevo cliente conectado: ${socket.id}`);
 
