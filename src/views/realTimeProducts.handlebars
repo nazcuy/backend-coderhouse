@@ -1,5 +1,4 @@
 <h1>Productos en Tiempo Real</h1>
-<p>Esta vista se actualiza AUTOMÁTICAMENTE cuando otros usuarios crean/eliminan productos</p>
 
 <div id="products-container">
     {{#if products}}
@@ -30,9 +29,9 @@
     <button type="submit">Agregar Producto</button>
 </form>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
-    
     console.log("WebSocket conectado, ID:", socket.id);
 
     socket.on("newProduct", (product) => {
@@ -57,6 +56,16 @@
         `;
         
         container.prepend(productDiv);
+
+        Swal.fire({
+            title: '¡Nuevo Producto!',
+            text: `${product.title} ha sido agregado`,
+            icon: 'success',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
     });
     
     socket.on("deleteProduct", (productId) => {
@@ -103,17 +112,42 @@
             }
             
             const result = await response.json();
+
+            Swal.fire({
+                title: "¡Producto Creado!",
+                text: `"${result.title}" ha sido creado exitosamente`,
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            });
+
             console.log("Producto creado via HTTP:", result);
             
             document.getElementById("product-form").reset();
                         
         } catch (error) {
-            alert("Error: " + error.message);
+            Swal.fire({
+                title: "Error",
+                text: error.message,
+                icon: "error",
+                confirmButtonText: "Entendido"
+            });
         }
     });
         
     window.deleteProduct = async (productId) => {
-        if (!confirm("¿Estás seguro de eliminar este producto?")) return;
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: "No podrás revertir esta acción",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+        
+        if (!result.isConfirmed) return;
         
         try {
             const response = await fetch(`/api/products/${productId}`, {
@@ -124,9 +158,23 @@
                 const error = await response.json();
                 throw new Error(error.error || "Error al eliminar");
             }
-            console.log("Producto eliminado via HTTP:", productId);
+            
+            Swal.fire({
+                title: 'Eliminado',
+                text: 'El producto ha sido eliminado',
+                icon: 'success',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+            
         } catch (error) {
-            alert("Error: " + error.message);
+            Swal.fire({
+                title: "Error",
+                text: error.message,
+                icon: "error"
+            });
         }
     };
 </script>
