@@ -9,6 +9,16 @@ import morgan from "morgan";
 
 const app = express();
 const PORT = 8080;
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/";
+
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => console.log("Conectado a MongoDB"))
+  .catch((error) => {
+    console.error("Error conectando a MongoDB:", error);
+    process.exit(1);
+  });
+
 
 app.engine("handlebars", handlebars.engine());
 app.set("views", "./src/views");
@@ -43,4 +53,5 @@ io.on("connection", (socket) => {
 httpServer.listen(PORT, () => {
   console.log(`Servidor HTTP en http://localhost:${PORT}`);
   console.log(`WebSocket activo en http://localhost:${PORT}`);
+  console.log(`Vistas disponibles en http://localhost:${PORT}/products`);
 });

@@ -1,17 +1,25 @@
 import { Router } from "express";
-import ProductManager from "../managers/product-manager.js";
+
+//FileSystem:
+//import ProductManager from "../dao/fs/product-manager.js";
+//const manager = new ProductManager("./data/products.json");
+
+//MongoDB:
+import ProductManager from "../dao/mongo/ProductManager.js";
+const manager = new ProductManager();
 
 const router = Router();
-const manager = new ProductManager("./data/products.json");
+
 
 router.get("/", async (req, res) => {
     try {
-        const products = await manager.getAll();
-        const { limit } = req.query;
-        if (limit) {
-            return res.json(products.slice(0, limit));
-        }
-        res.json(products);
+        const { limit, page } = req.query;
+        const result = await manager.getAll({
+            limit: limit || 10,
+            page: page || 1,
+        });
+        res.json(result);
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -24,7 +32,10 @@ router.get("/:pid", async (req, res) => {
         
         if (!product) return res.status(404).json({ error: "Producto no encontrado" });
         
-        res.json(product);
+        res.json({
+            status: "success",
+            payload: { ...product, message: "Producto encontrado exitosamente" },
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -34,7 +45,10 @@ router.post("/", async (req, res) => {
     try {
         const newProduct = await manager.create(req.body);
         req.io.emit("newProduct", newProduct);
-        res.status(201).json(newProduct);
+        res.status(201).json({
+            status: "success",
+            payload: { ...newProduct, message: "Producto creado exitosamente" },
+        });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -45,7 +59,10 @@ router.put("/:pid", async (req, res) => {
         const { pid } = req.params;
         const updatedProduct = await manager.update(pid, req.body);
         req.io.emit("updateProduct", updatedProduct);
-        res.json(updatedProduct);
+        res.json({
+            status: "success",
+            payload: { ...updatedProduct, message: "Producto actualizado exitosamente" },
+        });
     } catch (error) {
         res.status(404).json({ error: error.message });
     }
@@ -54,9 +71,12 @@ router.put("/:pid", async (req, res) => {
 router.delete("/:pid", async (req, res) => {
     try {
         const { pid } = req.params;
-        await manager.delete(pid);
+        const result = await manager.delete(pid);
         req.io.emit("deleteProduct", pid);
-        res.json({ message: "Producto eliminado exitosamente" });
+        res.json({
+            status: "success",
+            payload: { ...result, message: "Producto eliminado exitosamente" },
+    });
     } catch (error) {
         res.status(404).json({ error: error.message });
     }
