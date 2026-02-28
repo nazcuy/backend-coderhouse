@@ -1,11 +1,5 @@
 import mongoose from "mongoose";
 
-// ============================================
-// MODELO DE CARRITO CON MONGOOSE
-// ============================================
-// El carrito tiene un array de productos donde cada elemento
-// tiene una referencia al modelo Product (populate)
-
 const cartSchema = new mongoose.Schema(
   {
     products: [
@@ -30,7 +24,6 @@ const cartSchema = new mongoose.Schema(
   }
 );
 
-// Populate automático
 cartSchema.pre("find", function () {
   this.populate("products.product");
 });

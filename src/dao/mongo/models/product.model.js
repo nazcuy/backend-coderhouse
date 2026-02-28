@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-// ============================================
-// MODELO DE PRODUCTO CON MONGOOSE
-// ============================================
-// Definimos el esquema de producto con todas las propiedades requeridas
-
 const productSchema = new mongoose.Schema(
   {
     title: {

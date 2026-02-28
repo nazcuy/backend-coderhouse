@@ -1,15 +1,6 @@
 import { CartModel } from "./models/cart.model.js";
 import { ProductModel } from "./models/product.model.js";
-
-// ============================================
-// CART MANAGER CON MONGODB (MONGOOSE)
-// ============================================
-// Implementación con MongoDB usando Mongoose y referencias
-
 export default class CartManager {
-  // ============================================
-  // OBTENER TODOS LOS CARRITOS
-  // ============================================
 
   async getAll() {
     try {
@@ -20,10 +11,6 @@ export default class CartManager {
     }
   }
 
-  // ============================================
-  // CREAR UN NUEVO CARRITO
-  // ============================================
-
   async create() {
     try {
       const newCart = await CartModel.create({ products: [] });
@@ -33,10 +20,6 @@ export default class CartManager {
     }
   }
 
-  // ============================================
-  // OBTENER UN CARRITO POR ID (CON POPULATE)
-  // ============================================
-
   async getById(id) {
     try {
       const cart = await CartModel.findById(id).populate("products.product").lean();
@@ -45,10 +28,6 @@ export default class CartManager {
       throw new Error(`Error al obtener carrito: ${error.message}`);
     }
   }
-
-  // ============================================
-  // AGREGAR PRODUCTO AL CARRITO
-  // ============================================
 
   async addProductToCart(cartId, productId) {
     try {
@@ -83,11 +62,6 @@ export default class CartManager {
     }
   }
 
-  // ============================================
-  // ELIMINAR PRODUCTO DEL CARRITO
-  // ============================================
-  // DELETE /api/carts/:cid/products/:pid
-
   async removeProductFromCart(cartId, productId) {
     try {
       const cart = await CartModel.findById(cartId);
@@ -107,11 +81,6 @@ export default class CartManager {
     }
   }
 
-  // ============================================
-  // ACTUALIZAR TODOS LOS PRODUCTOS DEL CARRITO
-  // ============================================
-  // PUT /api/carts/:cid
-
   async updateCartProducts(cartId, products) {
     try {
       if (!Array.isArray(products)) {
@@ -120,7 +89,7 @@ export default class CartManager {
 
       for (const item of products) {
         if (!item.product || !item.quantity) {
-          throw new Error("Cada producto debe tener 'product' (ID) y 'quantity'");
+          throw new Error("Cada producto debe tener ID y cantidad");
         }
         const productExists = await ProductModel.findById(item.product);
         if (!productExists) {
@@ -143,11 +112,6 @@ export default class CartManager {
       throw new Error(`Error al actualizar carrito: ${error.message}`);
     }
   }
-
-  // ============================================
-  // ACTUALIZAR CANTIDAD DE UN PRODUCTO
-  // ============================================
-  // PUT /api/carts/:cid/products/:pid
 
   async updateProductQuantity(cartId, productId, quantity) {
     try {
@@ -177,11 +141,6 @@ export default class CartManager {
     }
   }
 
-  // ============================================
-  // ELIMINAR TODOS LOS PRODUCTOS DEL CARRITO
-  // ============================================
-  // DELETE /api/carts/:cid
-
   async clearCart(cartId) {
     try {
       const cart = await CartModel.findByIdAndUpdate(
@@ -199,10 +158,6 @@ export default class CartManager {
       throw new Error(`Error al vaciar carrito: ${error.message}`);
     }
   }
-
-  // ============================================
-  // ELIMINAR UN CARRITO COMPLETAMENTE
-  // ============================================
 
   async delete(cartId) {
     try {

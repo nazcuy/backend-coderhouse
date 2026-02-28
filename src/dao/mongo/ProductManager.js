@@ -1,22 +1,10 @@
 import { ProductModel } from "./models/product.model.js";
-
-// ============================================
-// PRODUCT MANAGER CON MONGODB (MONGOOSE)
-// ============================================
-// Implementación con MongoDB usando Mongoose
-// Incluye paginación, filtros y ordenamiento
-
 export default class ProductManager {
-  // ============================================
-  // OBTENER TODOS LOS PRODUCTOS CON PAGINACIÓN
-  // ============================================
-  
   async getAll({ limit = 10, page = 1, sort, query } = {}) {
     try {
       limit = parseInt(limit);
       page = parseInt(page);
 
-      // Construir el filtro
       let filter = {};
 
       if (query) {
@@ -27,7 +15,6 @@ export default class ProductManager {
         }
       }
 
-      // Construir opciones de ordenamiento
       let sortOption = {};
       if (sort === "asc") {
         sortOption.price = 1;
@@ -65,10 +52,6 @@ export default class ProductManager {
     }
   }
 
-  // ============================================
-  // OBTENER UN PRODUCTO POR ID
-  // ============================================
-
   async getById(id) {
     try {
       const product = await ProductModel.findById(id).lean();
@@ -77,10 +60,6 @@ export default class ProductManager {
       throw new Error(`Error al obtener producto: ${error.message}`);
     }
   }
-
-  // ============================================
-  // CREAR UN NUEVO PRODUCTO
-  // ============================================
 
   async create(obj) {
     try {
@@ -101,10 +80,6 @@ export default class ProductManager {
     }
   }
 
-  // ============================================
-  // ACTUALIZAR UN PRODUCTO
-  // ============================================
-
   async update(id, obj) {
     try {
       const { _id, id: objId, code, ...updateData } = obj;
@@ -124,10 +99,6 @@ export default class ProductManager {
       throw new Error(`Error al actualizar producto: ${error.message}`);
     }
   }
-
-  // ============================================
-  // ELIMINAR UN PRODUCTO
-  // ============================================
 
   async delete(id) {
     try {
