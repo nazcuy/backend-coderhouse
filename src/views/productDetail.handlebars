@@ -1,0 +1,258 @@
+<a href="/products" class="btn btn-back">Volver a Productos</a>
+
+<div class="product-detail">
+    <div class="product-image">
+        {{#if product.thumbnails.length}}
+            <img src="{{product.thumbnails.[0]}}" alt="{{product.title}}">
+        {{else}}
+            <div class="no-image">Sin imagen</div>
+        {{/if}}
+    </div>
+    
+    <div class="product-info">
+        <h1>{{product.title}}</h1>
+        
+        <p class="category">Categoría: <span>{{product.category}}</span></p>
+        
+        <p class="price">${{product.price}}</p>
+        
+        <div class="description">
+            <h3>Descripción</h3>
+            <p>{{product.description}}</p>
+        </div>
+        
+        <div class="details">
+            <p><strong>Código:</strong> {{product.code}}</p>
+            <p><strong>Stock disponible:</strong> {{product.stock}} unidades</p>
+            <p><strong>Estado:</strong> 
+                {{#if product.status}}
+                    <span class="badge badge-success">Disponible</span>
+                {{else}}
+                    <span class="badge badge-danger">No disponible</span>
+                {{/if}}
+            </p>
+            <p><strong>Fecha de creación:</strong> {{formatDate product.createdAt}}</p>
+        </div>
+        
+        <div class="actions">
+            <div class="quantity-selector">
+                <label for="quantity">Cantidad:</label>
+                <input type="number" id="quantity" min="1" max="{{product.stock}}" value="1">
+            </div>
+            
+            <button class="btn btn-add-cart" onclick="addToCart('{{product._id}}')">
+                Agregar al Carrito
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Helper para formatear fecha (lo definimos en el servidor)
+// Pero también podemos hacerlo aquí si es necesario
+
+async function addToCart(productId) {
+    const quantity = parseInt(document.getElementById('quantity').value);
+    
+    // Obtenemos o creamos el cartId
+    let cartId = localStorage.getItem('cartId');
+    
+    if (!cartId) {
+        try {
+            const response = await fetch('/api/carts', { method: 'POST' });
+            const data = await response.json();
+            cartId = data.payload._id;
+            localStorage.setItem('cartId', cartId);
+        } catch (error) {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo crear el carrito',
+                icon: 'error'
+            });
+            return;
+        }
+    }
+    
+    try {
+        for (let i = 0; i < quantity; i++) {
+            await fetch(`/api/carts/${cartId}/product/${productId}`, {
+                method: 'POST'
+            });
+        }
+        
+        Swal.fire({
+            title: '¡Agregado!',
+            text: `${quantity} unidad(es) agregada(s) al carrito`,
+            icon: 'success',
+            showCancelButton: true,
+            confirmButtonText: 'Ver Carrito',
+            cancelButtonText: 'Seguir Comprando'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/carts/${cartId}`;
+            }
+        });
+    } catch (error) {
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudo agregar el producto',
+            icon: 'error'
+        });
+    }
+}
+</script>
+
+<style>
+.btn-back {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn-back:hover {
+    background-color: #5a6268;
+}
+
+.product-detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.product-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    min-height: 400px;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+}
+
+.no-image {
+    font-size: 5em;
+    color: #ccc;
+}
+
+.product-info h1 {
+    margin-top: 0;
+    color: #333;
+    font-size: 2em;
+}
+
+.category {
+    color: #666;
+    font-size: 1.1em;
+}
+
+.category span {
+    background: #e9ecef;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+}
+
+.price {
+    font-size: 2.5em;
+    color: #28a745;
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+.description {
+    margin: 25px 0;
+}
+
+.description h3 {
+    color: #333;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.details {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.details p {
+    margin: 8px 0;
+}
+
+.badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+}
+
+.badge-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.actions {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+}
+
+.quantity-selector {
+    margin-bottom: 15px;
+}
+
+.quantity-selector label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.quantity-selector input {
+    width: 80px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.btn-add-cart {
+    width: 100%;
+    padding: 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-add-cart:hover {
+    background-color: #218838;
+}
+
+@media (max-width: 768px) {
+    .product-detail {
+        grid-template-columns: 1fr;
+    }
+}
+</style>

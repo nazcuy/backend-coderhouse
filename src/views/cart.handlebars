@@ -1,0 +1,398 @@
+<h1>🛒 Mi Carrito</h1>
+
+{{#if products.length}}
+    <!-- Tabla de productos -->
+    <div class="cart-container">
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio Unitario</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each products}}
+                    <tr data-product-id="{{this.product._id}}">
+                        <td class="product-cell">
+                            <div class="product-info">
+                                <strong>{{this.product.title}}</strong>
+                                <span class="product-code">{{this.product.code}}</span>
+                            </div>
+                        </td>
+                        <td class="price-cell">${{this.product.price}}</td>
+                        <td class="quantity-cell">
+                            <div class="quantity-control">
+                                <button onclick="updateQuantity('{{this.product._id}}', {{this.quantity}} - 1)">-</button>
+                                <span class="quantity">{{this.quantity}}</span>
+                                <button onclick="updateQuantity('{{this.product._id}}', {{this.quantity}} + 1)">+</button>
+                            </div>
+                        </td>
+                        <td class="subtotal-cell">
+                            ${{multiply this.product.price this.quantity}}
+                        </td>
+                        <td class="actions-cell">
+                            <button class="btn-remove" onclick="removeProduct('{{this.product._id}}')">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>Total de productos:</span>
+                <span>{{products.length}} diferentes</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total a pagar:</span>
+                <span class="total-price">${{total}}</span>
+            </div>
+            
+            <div class="cart-actions">
+                <button class="btn btn-danger" onclick="clearCart()">
+                    Vaciar Carrito
+                </button>
+                <a href="/products" class="btn btn-continue">
+                    Seguir Comprando
+                </a>
+                <button class="btn btn-checkout" onclick="checkout()">
+                    Finalizar Compra
+                </button>
+            </div>
+        </div>
+    </div>
+{{else}}
+    <!-- Carrito vacío -->
+    <div class="empty-cart">
+        <div class="empty-icon">🛒</div>
+        <h2>Tu carrito está vacío</h2>
+        <p>Agregá productos</p>
+        <a href="/products" class="btn btn-primary">
+            Ver Productos
+        </a>
+    </div>
+{{/if}}
+
+<script>
+const cartId = '{{cartId}}';
+
+async function updateQuantity(productId, newQuantity) {
+    if (newQuantity < 1) {
+        removeProduct(productId);
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ quantity: newQuantity })
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            throw new Error('Error al actualizar');
+        }
+    } catch (error) {
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudo actualizar la cantidad',
+            icon: 'error'
+        });
+    }
+}
+
+async function removeProduct(productId) {
+    const result = await Swal.fire({
+        title: '¿Eliminar producto?',
+        text: '¿Estás seguro de que querés eliminar este producto del carrito?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    });
+    
+    if (!result.isConfirmed) return;
+    
+    try {
+        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            Swal.fire({
+                title: 'Eliminado',
+                text: 'Producto eliminado del carrito',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.reload();
+            });
+        } else {
+            throw new Error('Error al eliminar');
+        }
+    } catch (error) {
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudo eliminar el producto',
+            icon: 'error'
+        });
+    }
+}
+
+// Vaciar todo el carrito
+async function clearCart() {
+    const result = await Swal.fire({
+        title: '¿Vaciar carrito?',
+        text: '¿Estás seguro de que querés eliminar todos los productos?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, vaciar',
+        cancelButtonText: 'Cancelar'
+    });
+    
+    if (!result.isConfirmed) return;
+    
+    try {
+        const response = await fetch(`/api/carts/${cartId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            Swal.fire({
+                title: 'Carrito vacío',
+                text: 'Todos los productos han sido eliminados',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.reload();
+            });
+        } else {
+            throw new Error('Error al vaciar');
+        }
+    } catch (error) {
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudo vaciar el carrito',
+            icon: 'error'
+        });
+    }
+}
+
+// Finalizar compra (placeholder)
+function checkout() {
+    Swal.fire({
+        title: 'Próximamente',
+        text: 'La funcionalidad de checkout estará disponible más adelante.',
+        icon: 'info'
+    });
+}
+</script>
+
+<style>
+.cart-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart-table th {
+    background: #007bff;
+    color: white;
+    padding: 15px;
+    text-align: left;
+}
+
+.cart-table td {
+    padding: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.cart-table tr:hover {
+    background: #f8f9fa;
+}
+
+.product-cell .product-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-code {
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 5px;
+}
+
+.price-cell, .subtotal-cell {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-control button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+.quantity-control button:hover {
+    background: #0056b3;
+}
+
+.quantity {
+    font-weight: bold;
+    min-width: 30px;
+    text-align: center;
+}
+
+.btn-remove {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-remove:hover {
+    background: #c82333;
+}
+
+.cart-summary {
+    padding: 20px;
+    background: #f8f9fa;
+    border-top: 2px solid #dee2e6;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-size: 1.1em;
+}
+
+.summary-row.total {
+    border-top: 2px solid #dee2e6;
+    margin-top: 10px;
+    padding-top: 15px;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.total-price {
+    color: #28a745;
+    font-size: 1.5em;
+}
+
+.cart-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.cart-actions .btn {
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    font-size: 1em;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-continue {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-checkout {
+    background: #28a745;
+    color: white;
+    margin-left: auto;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.empty-icon {
+    font-size: 5em;
+    margin-bottom: 20px;
+}
+
+.empty-cart h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.empty-cart p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+    .cart-table th,
+    .cart-table td {
+        padding: 10px 5px;
+        font-size: 0.9em;
+    }
+    
+    .cart-actions {
+        flex-direction: column;
+    }
+    
+    .btn-checkout {
+        margin-left: 0;
+    }
+}
+</style>
