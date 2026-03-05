@@ -1,5 +1,6 @@
 import { CartModel } from "./models/cart.model.js";
 import { ProductModel } from "./models/product.model.js";
+
 export default class CartManager {
 
   async getAll() {
@@ -14,7 +15,7 @@ export default class CartManager {
   async create() {
     try {
       const newCart = await CartModel.create({ products: [] });
-      return newCart;
+      return newCart.toObject();
     } catch (error) {
       throw new Error(`Error al crear carrito: ${error.message}`);
     }
@@ -41,21 +42,20 @@ export default class CartManager {
         throw new Error("Carrito no encontrado");
       }
 
+      const productIdStr = productId.toString();
+
       const productIndex = cart.products.findIndex(
-        (p) => p.product.toString() === productId
+        (item) => item.product.toString() === productIdStr
       );
 
       if (productIndex !== -1) {
         cart.products[productIndex].quantity += 1;
       } else {
-        cart.products.push({
-          product: productId,
-          quantity: 1,
-        });
+        cart.products.push({ product: productId, quantity: 1 });
       }
 
       await cart.save();
-      
+
       return await CartModel.findById(cartId).populate("products.product").lean();
     } catch (error) {
       throw new Error(`Error al agregar producto al carrito: ${error.message}`);
@@ -69,12 +69,14 @@ export default class CartManager {
         throw new Error("Carrito no encontrado");
       }
 
+      const productIdStr = productId.toString();
+
       cart.products = cart.products.filter(
-        (p) => p.product.toString() !== productId
+        (item) => item.product.toString() !== productIdStr
       );
 
       await cart.save();
-      
+
       return await CartModel.findById(cartId).populate("products.product").lean();
     } catch (error) {
       throw new Error(`Error al eliminar producto del carrito: ${error.message}`);
@@ -124,8 +126,9 @@ export default class CartManager {
         throw new Error("Carrito no encontrado");
       }
 
+      const productIdStr = productId.toString();
       const productIndex = cart.products.findIndex(
-        (p) => p.product.toString() === productId
+        (item) => item.product.toString() === productIdStr
       );
 
       if (productIndex === -1) {

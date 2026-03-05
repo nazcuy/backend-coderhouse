@@ -13,10 +13,12 @@ const router = Router();
 
 router.get("/", async (req, res) => {
     try {
-        const { limit, page } = req.query;
+        const { limit, page, sort, query } = req.query;
         const result = await manager.getAll({
             limit: limit || 10,
             page: page || 1,
+            sort: sort || 1,
+            query: query || null,
         });
         res.json(result);
 
